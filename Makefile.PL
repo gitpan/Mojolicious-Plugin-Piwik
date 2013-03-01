@@ -6,11 +6,14 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   VERSION_FROM => 'lib/Mojolicious/Plugin/Piwik.pm',
+  ABSTRACT     => 'Use Piwik in Mojolicious',
   NAME         => 'Mojolicious::Plugin::Piwik',
   AUTHOR       => 'Nils Diewald',
-  PREREQ_PM => {
-    'Mojolicious' => 3.43,
+  BUILD_REQUIRES => {
     'Test::More' => 0
+  },
+  PREREQ_PM => {
+    'Mojolicious' => 3.43
   },
   LICENSE      => 'perl',
   META_MERGE   => {
@@ -20,6 +23,7 @@ WriteMakefile(
       repository  => 'https://github.com/Akron/Mojolicious-Plugin-Piwik'
     }
   },
-  test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t t/*/*/*/*.t'}
+  MIN_PERL_VERSION => '5.010001',
+  test => {TESTS => 't/*.t'}
 );
 

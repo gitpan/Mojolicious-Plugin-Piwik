@@ -1,5 +1,7 @@
 lib/Mojolicious/Plugin/Piwik.pm
 t/piwik.t
+t/piwik-opt-out.t
+t/piwik-track.t
 Changes
 MANIFEST
 LICENSE

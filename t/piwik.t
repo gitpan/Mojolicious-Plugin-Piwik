@@ -3,6 +3,7 @@ use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
 use Mojo::JSON;
+use Data::Dumper;
 use utf8;
 
 $|++;
@@ -136,11 +137,11 @@ my $array = $app->piwik_api(
   }
 );
 
-is($array->[0]->[0], 'piwik', 'API.getDescriptionArray 1');
-is($array->[1]->[0], 'open source', 'API.getDescriptionArray 2');
-is($array->[2]->[0], 'web analytics', 'API.getDescriptionArray 3');
-is($array->[3]->[0], 'free', 'API.getDescriptionArray 4');
-is($array->[4]->[0], 'Strong message: Свободный Тибет',
+is($array->[0], 'piwik', 'API.getDescriptionArray 1');
+is($array->[1], 'open source', 'API.getDescriptionArray 2');
+is($array->[2], 'web analytics', 'API.getDescriptionArray 3');
+is($array->[3], 'free', 'API.getDescriptionArray 4');
+is($array->[4], 'Strong message: Свободный Тибет',
    'API.getDescriptionArray 5');
 
 my $table = $app->piwik_api(
@@ -186,5 +187,7 @@ is($sd->[3], 0, 'getMultiArray 6');
 is($sd->[4], 152, 'getMultiArray 7');
 is($sd->[5], 'test', 'getMultiArray 8');
 is($sd->[6]->{42}, 'end', 'getMultiArray 9');
+
+
 
 done_testing;
