@@ -21,41 +21,6 @@ $app->plugin(Piwik => {
   url => 'sojolicio.us/piwik'
 });
 
-like($app->piwik_tag, qr{'://sojolicio.us/piwik/'}, 'URL');
-like($app->piwik_tag, qr{setSiteId',1}, 'SiteId');
-
-like($app->piwik_tag(2), qr{'://sojolicio.us/piwik/'}, 'URL');
-like($app->piwik_tag(2), qr{setSiteId',2}, 'SiteId');
-
-like($app->piwik_tag(
-  2 => 'http://sojolicio.us/piwik/piwik.php'
-), qr{'://sojolicio.us/piwik/'}, 'URL');
-like($app->piwik_tag(
-  2 => 'http://sojolicio.us/piwik/piwik.php'
-), qr{setSiteId',2}, 'SiteId');
-
-like($app->piwik_tag(
-  3 => 'https://sojolicio.us/piwik/piwik.js'
-), qr{'://sojolicio.us/piwik/'}, 'URL');
-like($app->piwik_tag(
-  3 => 'http://sojolicio.us/piwik/piwik.js'
-), qr{setSiteId',3}, 'SiteId');
-
-like($app->piwik_tag(
-  4 => 'sojolicio.us/piwik'
-), qr{'://sojolicio.us/piwik/'}, 'URL');
-like($app->piwik_tag(
-  4 => 'sojolicio.us/piwik'
-), qr{setSiteId',4}, 'SiteId');
-
-$app->mode('development');
-
-$app->plugin('Piwik' => {
-  url => 'sojolicio.us/piwik'
-});
-
-ok(!$app->piwik_tag, 'Development mode');
-
 # API test
 my $url = $app->piwik_api('API.get' => {
   site_id => [4,5],
@@ -187,7 +152,5 @@ is($sd->[3], 0, 'getMultiArray 6');
 is($sd->[4], 152, 'getMultiArray 7');
 is($sd->[5], 'test', 'getMultiArray 8');
 is($sd->[6]->{42}, 'end', 'getMultiArray 9');
-
-
 
 done_testing;

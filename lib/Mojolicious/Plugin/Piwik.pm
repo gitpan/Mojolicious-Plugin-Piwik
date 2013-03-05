@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Todo:
 # - Better test tracking API support
@@ -13,6 +13,7 @@ our $VERSION = '0.09';
 # - Add eCommerce support
 #   http://piwik.org/docs/ecommerce-analytics/
 # - Improve error handling.
+# - Introduce piwik_widget helper
 
 
 # Register plugin
@@ -236,7 +237,7 @@ SCRIPTTAG
       $url->query($param);
 
       # Return string for api testing
-      return $url->to_string if $api_test;
+      return $url if $api_test;
 
       # Create Mojo::UserAgent
       my $ua = Mojo::UserAgent->new(max_redirects => 2);
@@ -247,7 +248,8 @@ SCRIPTTAG
       unless ($cb) {
 	my $tx = $ua->get($url);
 
-	return _treat_response($tx->res) if $tx->success;
+	# Return prepared response
+	return _prepare_response($tx->res) if $tx->success;
 
 	return;
       }
@@ -259,23 +261,40 @@ SCRIPTTAG
 	    my ($ua, $tx) = @_;
 
 	    my $json = {};
-	    $json = _treat_response($tx->res) if $tx->success;
 
+	    # Return prepared response
+	    $json = _prepare_response($tx->res) if $tx->success;
+
+	    # Release callback
 	    $cb->($json);
 	  });
 	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
       };
     });
+
+  # Establish 'piwik_api_url' helper
+  $mojo->helper(
+    piwik_api_url => sub {
+      my ($c, $method, $param) = @_;
+
+      # Set api_test to true
+      $param->{api_test} = 1;
+      return $c->piwik_api($method => $param);
+    }
+  );
 };
 
-sub _treat_response {
+# Treat response different
+sub _prepare_response {
   my $res = shift;
   my $ct = $res->headers->content_type;
 
+  # Return json response
   if (index($ct, 'json') >= 0) {
     return $res->json;
   }
 
+  # Prepare erroneous html response
   elsif (index($ct, 'html') >= 0) {
 
     # Find error message in html
@@ -288,13 +307,18 @@ sub _treat_response {
     return { error => $found->all_text };
   }
 
+  # Prepare image responses
   elsif ($ct =~ m{^image/(gif|jpe?g)}) {
     return {
       image => 'data:image/' . $1 . ';base64,' . b($res->body)->b64_encode
     };
   };
 
-  return { error => 'Unknown response type' };
+  # Return unknown response type
+  return {
+    error => 'Unknown response type',
+    body  => $res->body
+  };
 };
 
 
@@ -408,12 +432,13 @@ instance. Defaults to the site id and the url given when the plugin
 was registered.
 
 This tag should be included at the bottom
-of the body tag of your website.
+of the body tag of each website you want to analyse.
 
   %= piwik_tag 'opt-out', width => 400
 
-The special C<opt-out> tag renders an iframe helping
-your visitors to disallow tracking via javascript.
+The special C<opt-out> tag renders an
+L<iframe|http://piwik.org/privacy/#toc-step-3-include-a-web-analytics-opt-out-feature-on-your-site-using-an-iframe>
+helping your visitors to disallow tracking via javascript.
 See the L<default tag helper|Mojolicious::Plugin::TagHelpers/tag>
 for explanation of usage.
 
@@ -425,6 +450,8 @@ to the opt-out page to be used if the visitor does
 not allow third party cookies.
 See the L<default tag helper|Mojolicious::Plugin::TagHelpers/tag>
 for explanation of usage.
+
+B<The 'opt-out' and 'opt-out-link' options are EXPERIMENTAL and may change in further releases!>
 
 
 =head2 piwik_api
@@ -474,9 +501,10 @@ The ip address is not forwarded.
     });
 
 As the C<url> parameter is used to define the Piwik instance,
-the url of the requested resource to be named C<action_url>.
+the url of the requested resource has to be named C<action_url>.
 
-Please remember that cookie-based opt-out can't be supported.
+Please remember that cookie-based opt-out can't be supported
+for the non-javascript Tracking API.
 
 In addition to the parameters of the API references, the following
 parameters are allowed:
@@ -492,11 +520,6 @@ Defaults to the url given when the plugin was registered.
 
 C<secure> - Boolean value that indicates a request using the https scheme.
 Defaults to false.
-
-=item
-
-C<api_test> - Boolean value that indicates a test request, that returns the
-created request url instead of the JSON response. Defaults to false.
 
 =back
 
@@ -514,15 +537,39 @@ for example C<idSite> (for analysis), C<date> (for ranges) and C<res> (for track
     });
 
 In case of an error, C<piwik_api> tries to response with a meaningsful
-descriptin in the hash value of C<error>.
+description in the hash value of C<error>.
 If an image is expected instead of a JSON object
 (as for the Tracking or the C<ImageGraph> API), the image is base64
-encoded and mime-type prefixed in the hash value of image.
+encoded and mime-type prefixed in the hash value of C<image>,
+ready to be embedded as the C<src> of an C<E<lt>img /E<gt>> tag.
+
+
+=head2 piwik_api_url
+
+  my $src_url = $c->piwik_api_url(
+    'ImageGraph.get' => {
+      apiModule => 'VisitsSummary',
+      apiAction => 'get',
+      graphType => 'evolution',
+      period => 'day',
+      date   => 'last30',
+      width  => 500,
+      height => 250
+  });
+
+  # In template
+  <img src="<%= $src_url %>" alt="Piwik analysis" />
+
+Creates the URL of an API request and returns the L<Mojo::URL> object.
+Accepts the same parameters as the L<piwik_api|/piwik_api> helper,
+excluding the callback.
+
+B<This helper is EXPERIMENTAL and may change without warnings!>
 
 
 =head1 LIMITATIONS
 
-The plugin lacks support for eCommerce tracking.
+The plugin currently lacks support for eCommerce tracking.
 
 
 =head1 TESTING
@@ -539,7 +586,7 @@ and run C<make test>, for example:
     action_name => 'Märchen/Test'
   };
 
-The user agent to be ignored is called C<Mojo-Test>.
+The user agent to be ignored in your Piwik instance is called C<Mojo-Test>.
 
 
 =head1 DEPENDENCIES
@@ -562,6 +609,7 @@ and/or modify it under the same terms as Perl.
 Please make sure you are using Piwik in compliance to the law.
 For german users,
 L<this information|https://www.datenschutzzentrum.de/tracking/piwik/>
+(last accessed on 2013-03-03)
 may help you to design your service correctly.
 
 This plugin was developed for

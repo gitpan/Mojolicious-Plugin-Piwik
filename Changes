@@ -1,3 +1,10 @@
+0.10 2013-03-04
+        - Delete mentioning api_test in documentation.
+	- Declare 'opt-out' and 'opt-out-url' as EXPERIMENTAL.
+	- Introduce piwik_api_url helper as EXPERIMENTAL.
+        - Improve documentation.
+	- Fix POD error.
+
 0.09 2013-03-01
 	- Update year.
  	- Update comments.
