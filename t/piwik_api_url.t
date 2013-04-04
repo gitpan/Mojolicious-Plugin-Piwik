@@ -7,7 +7,6 @@ use Mojo::UserAgent;
 use Data::Dumper;
 use utf8;
 
-$|++;
 use lib '../lib';
 
 our $ft = 'auth.pl';

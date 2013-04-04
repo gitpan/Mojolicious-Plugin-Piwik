@@ -2,8 +2,9 @@ package Mojolicious::Plugin::Piwik;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
+use Mojo::IOLoop;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # Todo:
 # - Better test tracking API support
@@ -256,19 +257,23 @@ SCRIPTTAG
 
       # Non-Blocking
       else {
-	$ua->get(
-	  $url => sub {
-	    my ($ua, $tx) = @_;
 
-	    my $json = {};
-
+	# Create delay object
+	my $delay = Mojo::IOLoop->delay(
+	  sub {
 	    # Return prepared response
-	    $json = _prepare_response($tx->res) if $tx->success;
+	    my $res = pop->success;
 
-	    # Release callback
-	    $cb->($json);
-	  });
-	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+	    # Release callback with json object
+	    $cb->( $res ? _prepare_response($res) : {} );
+	  }
+	);
+
+	# Get resource non-blocking
+	$ua->get($url => $delay->begin);
+
+	# Start IOLoop if not started already
+	$delay->wait unless Mojo::IOLoop->is_running;
       };
     });
 

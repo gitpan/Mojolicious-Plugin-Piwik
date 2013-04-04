@@ -6,7 +6,6 @@ use Mojo::JSON;
 use Data::Dumper;
 use utf8;
 
-$|++;
 use lib '../lib';
 
 our $ft = 'auth.pl';

@@ -5,7 +5,6 @@ use Mojolicious::Lite;
 use Mojo::JSON;
 use utf8;
 
-$|++;
 use lib '../lib';
 
 our $ft = 'auth.pl';

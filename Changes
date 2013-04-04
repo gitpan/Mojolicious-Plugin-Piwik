@@ -1,3 +1,7 @@
+0.11 2013-04-03
+        - Improved test suite.
+	- Fixed non-blocking helper.
+
 0.10 2013-03-04
         - Delete mentioning api_test in documentation.
 	- Declare 'opt-out' and 'opt-out-url' as EXPERIMENTAL.
