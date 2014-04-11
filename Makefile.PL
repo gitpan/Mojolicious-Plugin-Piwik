@@ -15,7 +15,7 @@ WriteMakefile(
   PREREQ_PM => {
     'Mojolicious' => 3.43
   },
-  LICENSE      => 'perl',
+  LICENSE      => 'artistic_2',
   META_MERGE   => {
     requires  => {perl => '5.010001'},
     resources => {

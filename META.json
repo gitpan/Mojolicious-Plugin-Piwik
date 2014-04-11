@@ -4,9 +4,9 @@
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -46,5 +46,5 @@
          "url" : "https://github.com/Akron/Mojolicious-Plugin-Piwik"
       }
    },
-   "version" : "0.12"
+   "version" : "0.13"
 }

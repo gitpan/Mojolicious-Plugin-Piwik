@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
 use Mojo::IOLoop;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # Todo:
 # - Better test tracking API support
@@ -606,10 +606,10 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2013, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2014, L<Nils Diewald|http://nils-diewald.de/>.
 
-This program is free software, you can redistribute it
-and/or modify it under the same terms as Perl.
+This program is free software, you can redistribute it and/or
+modify it under the terms of the Artistic License version 2.0.
 
 Please make sure you are using Piwik in compliance to the law.
 For german users,
