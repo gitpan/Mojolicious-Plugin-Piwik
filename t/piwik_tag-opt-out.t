@@ -86,7 +86,7 @@ like($oo, qr{href="https://sojolicio\.us/piwik/index\.php\?module=CoreAdminHome&
 like($oo, qr{>MyOptOut<}, 'opt-out-link');
 like($oo, qr{rel="nofollow"}, 'opt-out-link');
 
-$oo = $c->render(inline => "<%= piwik_tag 'opt-out-link', begin %>Opt Out!<% end %>", partial => 1);
+$oo = $c->include(inline => "<%= piwik_tag 'opt-out-link', begin %>Opt Out!<% end %>");
 
 like($oo, qr{<a href=".+" rel="nofollow">Opt Out!</a>}, 'opt-out-link');
 

@@ -1,3 +1,6 @@
+0.14 2014-06-04
+        - Compatible with Mojolicious >= 5.0.
+
 0.13 2014-04-11
         - Make it coherent Artistic License 2.0.
 
